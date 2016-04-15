@@ -132,25 +132,62 @@ var miniracktest_codegenerator = function() {
     return request.getUrl(true).getComponentAtIndex(2);
   };
 
+  // in order to render correct casted values
+  this.add_handlebars_helper = function(h) {
+    h.registerHelper("cast_item_with_action", function(object) {
+      cast = ".must_equal ";
+
+      if (object === null) {
+        cast = "null";
+      } else if (typeof object === 'string') {
+        if (object == 'id') {
+          cast = ".wont_be_nil";
+        } else {
+          cast += "'" + object + "'";
+        }
+      } else if (typeof object === 'number') {
+        cast += object;
+      } else if (typeof object === 'boolean') {
+        cast += (object ? "true" : "false");
+      } else if (typeof object === 'object') {
+        cast += "JSON.parse <<-JSON";
+        cast += "\n    " + JSON.stringify(object);
+        cast += "\n    JSON"
+      }
+
+      return cast;
+    });
+  };
+
   // implement the generate() method to generate code
   this.generate = function(context, requests, options) {
     var request = context.getCurrentRequest();
-    var Mustache = require("mustache.js") || root.Mustache;
+    var response = request.getLastExchange();
     var generated = "";
 
-    // import the mustache template
-    var template = readFile("spec.mustache");
-    Mustache.parse(template);
+    // import the Handlebars and init the template with helpers
+    var Handlebars = require("handlebars-v4.0.5.js");
+    this.add_handlebars_helper(Handlebars);
+    var template = Handlebars.compile(readFile("spec.handlebars"));
 
-    to_render = {
+    // we expect the response body to be JSON
+    var response_body = {};
+    if (response.responseBody !== undefined) {
+      response_body = JSON.parse(response.responseBody);
+    };
+
+    context = {
       spec_name: request.name,
+      spec_description: request.description,
       headers: this.headers(request),
       request_method: request.method.toLowerCase(),
       body: this.body(request),
-      path: this.get_path(request)
+      path: this.get_path(request),
+      response_body: response_body
     };
 
-    generated += Mustache.render(template, to_render);
+    // render the template with the context
+    generated += template(context);
 
     return generated
   }
