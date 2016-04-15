@@ -3,7 +3,7 @@
   {{else}}
   it 'should {{{spec_name}}}' do
   {{/if}}
-    # set request headers
+
     {{#if headers.has_headers}}
       {{#headers.header_list}}
     header '{{{header_name}}}', "{{{header_value}}}"
@@ -29,14 +29,19 @@
     }
     {{/body.has_url_encoded_body}}
     {{! ----- }}
-    {{#body.has_multipart_body}}
+    {{#if body.has_multipart_body}}
 
     payload = <<MULTI
     {{#body.multipart_body}}
       "{{{name}}}" => "{{{value}}}",
     {{/body.multipart_body}}
     MULTI
-    {{/body.has_multipart_body}}
+    {{else}}
+    {{#if body.has_multipart_body_pre}}
+
+    payload = Rack::Test::UploadedFile.new(file, 'image/[file]')
+    {{/if}}
+    {{/if}}
     {{! ----- }}
     {{#body.has_json_body}}
 

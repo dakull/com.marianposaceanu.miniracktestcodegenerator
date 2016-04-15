@@ -24,19 +24,23 @@ var miniracktest_codegenerator = function() {
 
   this.body = function(request) {
     var json_body, multipart_body, name, raw_body, url_encoded_body, value;
+
     json_body = request.jsonBody;
     if (json_body) {
       return {
         "has_body": true,
         "has_json_body": true,
+        "has_multipart_body_pre": false,
         "json_body_object": this.json_body_object(json_body, 2)
       };
     }
+
     url_encoded_body = request.urlEncodedBody;
     if (url_encoded_body) {
       return {
         "has_body": true,
         "has_url_encoded_body": true,
+        "has_multipart_body_pre": false,
         "url_encoded_body": (function() {
           var results;
           results = [];
@@ -51,11 +55,13 @@ var miniracktest_codegenerator = function() {
         })()
       };
     }
+
     multipart_body = request.multipartBody;
     if (multipart_body) {
       return {
         "has_body": true,
-        "has_multipart_body": true,
+        "has_multipart_body_pre": true,
+        "has_multipart_body": false,
         "multipart_body": (function() {
           var results;
           results = [];
@@ -70,6 +76,7 @@ var miniracktest_codegenerator = function() {
         })()
       };
     }
+
     raw_body = request.body;
     if (raw_body) {
       if (raw_body.length < 5000) {
@@ -172,7 +179,7 @@ var miniracktest_codegenerator = function() {
 
     // we expect the response body to be JSON
     var response_body = {};
-    if (response.responseBody !== undefined) {
+    if (response !== undefined) {
       response_body = JSON.parse(response.responseBody);
     };
 
