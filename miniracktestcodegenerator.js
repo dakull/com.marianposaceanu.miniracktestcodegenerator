@@ -128,27 +128,27 @@ var miniracktest_codegenerator = function() {
     return s;
   };
 
+  this.get_path = function(request) {
+    return request.getUrl(true).getComponentAtIndex(2);
+  };
+
   // implement the generate() method to generate code
   this.generate = function(context, requests, options) {
+    var request = context.getCurrentRequest();
     var Mustache = require("mustache.js") || root.Mustache;
-
     var generated = "";
 
     // import the mustache template
     var template = readFile("spec.mustache");
     Mustache.parse(template);
 
-    // get the headers
-    request_headers = this.headers(context.getCurrentRequest());
-
     to_render = {
-      spec_name: context.getCurrentRequest().name,
-      headers: request_headers,
-      request_method: context.getCurrentRequest().method.toLowerCase(),
-      body: this.body(context.getCurrentRequest())
+      spec_name: request.name,
+      headers: this.headers(request),
+      request_method: request.method.toLowerCase(),
+      body: this.body(request),
+      path: this.get_path(request)
     };
-
-    console.log(context.getCurrentRequest().method);
 
     generated += Mustache.render(template, to_render);
 
