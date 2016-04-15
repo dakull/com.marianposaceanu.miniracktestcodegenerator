@@ -1,0 +1,57 @@
+  {{#if spec_description}}
+  it 'should {{{spec_description}}}' do
+  {{else}}
+  it 'should {{{spec_name}}}' do
+  {{/if}}
+    # set request headers
+    {{#if headers.has_headers}}
+      {{#headers.header_list}}
+    header '{{{header_name}}}', "{{{header_value}}}"
+      {{/headers.header_list}}
+    {{/if}}
+    {{! ----- }}
+    {{#body.has_raw_body}}
+
+    payload = "{{{body.raw_body}}}"
+    {{/body.has_raw_body}}
+    {{! ----- }}
+    {{#body.has_long_body}}
+
+    payload = 'set your body string'
+    {{/body.has_long_body}}
+    {{! ----- }}
+    {{#body.has_url_encoded_body}}
+
+    payload = {
+    {{#body.url_encoded_body}}
+      "{{{name}}}" => "{{{value}}}",
+    {{/body.url_encoded_body}}
+    }
+    {{/body.has_url_encoded_body}}
+    {{! ----- }}
+    {{#body.has_multipart_body}}
+
+    payload = <<MULTI
+    {{#body.multipart_body}}
+      "{{{name}}}" => "{{{value}}}",
+    {{/body.multipart_body}}
+    MULTI
+    {{/body.has_multipart_body}}
+    {{! ----- }}
+    {{#body.has_json_body}}
+
+    payload = {{{body.json_body_object}}}
+    {{/body.has_json_body}}
+
+    {{#if body}}
+    {{{request_method}}} "{{{path}}}", payload
+    {{else}}
+    {{{request_method}}} "{{{path}}}"
+    {{/if}}
+
+    body = JSON.parse(last_response.body)
+
+    {{#each response_body}}
+    body['{{@key}}']{{{cast_item_with_action this}}}
+    {{/each}}
+  end
