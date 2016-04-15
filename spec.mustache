@@ -45,10 +45,10 @@
     {{/body.has_json_body}}
 
     {{#body}}
-    {{{request_method}}} "/users", payload
+    {{{request_method}}} "{{{path}}}", payload
     {{/body}}
     {{^body}}
-    {{{request_method}}} "/users"
+    {{{request_method}}} "{{{path}}}"
     {{/body}}
 
     body = JSON.parse(last_response.body)
