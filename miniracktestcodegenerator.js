@@ -195,7 +195,7 @@ var miniracktest_codegenerator = function() {
     var template = Handlebars.compile(readFile("spec.handlebars"));
 
     // we expect the response body to be JSON
-    var response_body = {};
+    var response_body = null;
     if (response !== undefined) {
       response_body = JSON.parse(response.responseBody);
     };
