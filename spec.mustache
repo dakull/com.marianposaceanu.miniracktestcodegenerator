@@ -1,0 +1,21 @@
+  let(:headers) do
+    {{#headers.header_list}}
+    header '{{{header_name}}}', "{{{header_value}}}"
+    {{/headers.header_list}}
+  end
+
+  it 'something' do
+    post '/users', new_user
+    body = JSON.parse(last_response.body)
+    user_id = body['id']
+
+    data = {
+      username: "new_user",
+      grant_type: "password",
+      password: "this_is_a_password",
+    }
+
+    post '/oauth/token', data
+
+    JSON.parse(last_response.body)['access_token'].wont_be_nil
+  end
