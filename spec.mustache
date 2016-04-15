@@ -5,19 +5,21 @@
     header '{{{header_name}}}', "{{{header_value}}}"
       {{/headers.header_list}}
     {{/headers.has_headers}}
-
     {{! ----- }}
     {{#body.has_raw_body}}
+
     // Create payload
     payload = "{{{body.raw_body}}}"
     {{/body.has_raw_body}}
     {{! ----- }}
     {{#body.has_long_body}}
+
     // Create payload
     payload = 'set your body string'
     {{/body.has_long_body}}
     {{! ----- }}
     {{#body.has_url_encoded_body}}
+
     // Create payload
     payload = {
     {{#body.url_encoded_body}}
@@ -27,6 +29,7 @@
     {{/body.has_url_encoded_body}}
     {{! ----- }}
     {{#body.has_multipart_body}}
+
     // Create payload
     payload = <<MULTI
     {{#body.multipart_body}}
@@ -36,11 +39,18 @@
     {{/body.has_multipart_body}}
     {{! ----- }}
     {{#body.has_json_body}}
+
     // Create payload
     payload = {{{body.json_body_object}}}
     {{/body.has_json_body}}
 
+    {{#body}}
     {{{request_method}}} "/users", payload
+    {{/body}}
+    {{^body}}
+    {{{request_method}}} "/users"
+    {{/body}}
+
     body = JSON.parse(last_response.body)
 
     # add expectations
