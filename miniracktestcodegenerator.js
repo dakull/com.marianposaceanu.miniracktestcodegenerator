@@ -141,19 +141,36 @@ var miniracktest_codegenerator = function() {
 
   // in order to render correct casted values
   this.add_handlebars_helper = function(h) {
-    h.registerHelper("cast_item_with_action", function(object) {
+    h.registerHelper("cast_item_with_action", function(object, key) {
       cast = ".must_equal ";
 
       if (object === null) {
         cast = "null";
       } else if (typeof object === 'string') {
-        if (object == 'id') {
+        var filters = (
+          object == 'id' ||
+          key.includes('access_token') ||
+          key.includes('refresh_token') ||
+          key.includes('created') ||
+          key.includes('updated')
+        );
+
+        if (filters) {
           cast = ".wont_be_nil";
         } else {
           cast += "'" + object + "'";
         }
       } else if (typeof object === 'number') {
-        cast += object;
+        var filters = (
+          key.includes('created') ||
+          key.includes('updated')
+        );
+
+        if (filters) {
+          cast = ".wont_be_nil";
+        } else {
+          cast += object;
+        }
       } else if (typeof object === 'boolean') {
         cast += (object ? "true" : "false");
       } else if (typeof object === 'object') {

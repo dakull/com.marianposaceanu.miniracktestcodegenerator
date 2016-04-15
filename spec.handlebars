@@ -57,6 +57,6 @@
     body = JSON.parse(last_response.body)
 
     {{#each response_body}}
-    body['{{@key}}']{{{cast_item_with_action this}}}
+    body['{{@key}}']{{{cast_item_with_action this @key}}}
     {{/each}}
   end
